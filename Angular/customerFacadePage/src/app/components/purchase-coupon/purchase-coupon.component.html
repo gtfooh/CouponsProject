@@ -1,0 +1,38 @@
+<form class="form-horizontal">
+  <div class="form-group">
+    <label for="idtoedit" class="control-label col-sm-2">Enter Coupon ID to Show:</label>
+    <button (click)="getCoupon()" class="btn btn-success btn-md">Get Coupon  <span class="glyphicon glyphicon-download-alt"></span></button>
+    <div class="col-sm-2">
+     <input class="form-control" placeholder="Enter ID" name = "idtoshow"
+             type="number" id="idtoshow" [(ngModel)] = "idtoshow"/>
+ </div>
+ </div>
+ </form>
+ <br>
+ <br>
+ <main class="container">
+ 
+  <!-- Left Column / Headphones Image -->
+  <div class="left-column">
+    <!-- <img src = "../../../assets/clothing.jpg"> -->
+    <img src= {{coupon.image}} >
+  </div>
+ 
+  
+  <!-- Right Column -->
+  <div class="right-column">
+ 
+    <!-- Product Description -->
+    <div class="product-description">
+      <h2> Title: {{coupon.title}}</h2>
+      <h4> Type: {{coupon.type}}</h4>
+      <h4> Start Date: {{coupon.startDate}}</h4>
+      <h4> End Date: {{coupon.endDate}}</h4>
+      <h4> Coupons Left: {{coupon.amount}}</h4>
+      <h4> Price: {{coupon.price}}</h4>
+      <h4> Description: {{coupon.message}}</h4>
+  </div>
+  <button (click)="purchseCoupon()" class="btn btn-primary btn-lg">Purchase Coupon  <span class="glyphicon glyphicon-usd"></span></button>
+
+</div>
+</main>

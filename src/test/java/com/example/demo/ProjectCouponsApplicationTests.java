@@ -1,17 +1,18 @@
 package com.example.demo;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
-import com.example.demo.crud.CustomerRepository;
+
 import com.example.demo.entities.Company;
 import com.example.demo.entities.Coupon;
 import com.example.demo.entities.Customer;
@@ -19,8 +20,11 @@ import com.example.demo.entry.AdminFacade;
 import com.example.demo.entry.CompanyFacade;
 import com.example.demo.entry.CouponSystem;
 import com.example.demo.entry.CustomerFacade;
+import com.example.demo.exceptions.CompanyNameTakenException;
 import com.example.demo.exceptions.CompanyNotFoundException;
+import com.example.demo.exceptions.CouponAlreadyExistsException;
 import com.example.demo.exceptions.CouponNotFoundException;
+import com.example.demo.exceptions.CustomerNameTakenException;
 import com.example.demo.exceptions.CustomerNotFoundException;
 import com.example.demo.exceptions.WrongClientTypeException;
 import com.example.demo.other.ClientType;
@@ -38,8 +42,7 @@ public class ProjectCouponsApplicationTests {
 CouponSystem couponSystem; 
 @Autowired
 TestHelper testHelper;
-@Autowired
-CustomerRepository customerRepo;
+
 
 /**
  * 2 company objects, 2 customer objects and 6 coupon objects created for tests
@@ -48,20 +51,13 @@ CustomerRepository customerRepo;
 	Company comp2 = new Company("JohnBryce","1234","office@jbh.co.il");
 	Customer cust1 = new Customer("dor","123343");
 	Customer cust2 = new Customer("user","1111");
-	Date today = new Date();
-	@SuppressWarnings("deprecation")
-	Date date1 = new Date(2018,12,31);
-	@SuppressWarnings("deprecation")
-	Date date2 = new Date(2019,12,31);
-	@SuppressWarnings("deprecation")
-	Date date3 = new Date(2019,06,30);
-	
-	Coupon coup1 = new Coupon("Coupon1",today,date1,5,CouponType.CLOTHING,"cloting coupon", 100, null);
-	Coupon coup2 = new Coupon("Coupon2",today,date2,7,CouponType.ELECTRONICS,"electronics coupon", 200, null);
-	Coupon coup3 = new Coupon("Coupon3",today,date1,5,CouponType.FLIGHTS,"flights coupon", 400, null);		
-	Coupon coup4 = new Coupon("Coupon4",today,date2,9,CouponType.CLOTHING,"cloting coupon", 150, null);
-	Coupon coup5 = new Coupon("Coupon5",today,date1,10,CouponType.ELECTRONICS,"electronics coupon", 250, null);
-	Coupon coup6 = new Coupon("Coupon6",today,date2,11,CouponType.FLIGHTS,"flights coupon", 450, null);
+	DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+	Coupon coup1 = new Coupon("Coupon1","2018-01-01","2018-12-31",1,CouponType.CLOTHING,"cloting coupon", 100, null);
+	Coupon coup2 = new Coupon("Coupon2","2018-01-01","2018-12-31",7,CouponType.ELECTRONICS,"electronics coupon", 200, null);
+	Coupon coup3 = new Coupon("Coupon3","2018-01-01","2018-12-31",5,CouponType.FLIGHTS,"flights coupon", 400, null);		
+	Coupon coup4 = new Coupon("Coupon4","2018-01-01","2018-12-31",9,CouponType.CLOTHING,"cloting coupon", 150, null);
+	Coupon coup5 = new Coupon("Coupon5","2018-01-01","2018-12-31",10,CouponType.ELECTRONICS,"electronics coupon", 250, null);
+	Coupon coup6 = new Coupon("Coupon6","2018-01-01","2018-12-31",11,CouponType.FLIGHTS,"flights coupon", 450, null);
 
 	@Test
 	public void contextLoads() {
@@ -70,11 +66,12 @@ CustomerRepository customerRepo;
  * tests login, createCompay and getCompany methods from AdminFacade
  * @throws WrongClientTypeException
  * @throws InterruptedException
+ * @throws CompanyNameTakenException 
  */
 	@Test
-	public void test01() throws InterruptedException, WrongClientTypeException {	
+	public void test01() throws InterruptedException, WrongClientTypeException, CompanyNameTakenException {	
 		AdminFacade adminF = (AdminFacade) couponSystem.login("Admin", "1234", ClientType.ADMIN);
-		adminF.createCompany(comp1);	
+		adminF.createCompany(comp1);		
 		testHelper.compareCompanies(comp1,adminF.getCompany(comp1.getId()));
 		
 	}
@@ -83,9 +80,10 @@ CustomerRepository customerRepo;
  * 	test removeCompany from AdminFacade
  * @throws WrongClientTypeException
  * @throws InterruptedException
+ * @throws CompanyNameTakenException 
  */
 	@Test
-	public void test02() throws WrongClientTypeException, InterruptedException {	
+	public void test02() throws WrongClientTypeException, InterruptedException, CompanyNameTakenException {	
 		AdminFacade adminF = (AdminFacade) couponSystem.login("Admin", "1234", ClientType.ADMIN);
 		adminF.createCompany(comp1);
 		adminF.removeCompany(comp1);
@@ -96,10 +94,11 @@ CustomerRepository customerRepo;
  * @throws WrongClientTypeException
  * @throws InterruptedException
  * @throws CompanyNotFoundException
+ * @throws CompanyNameTakenException 
  */
 	
 	@Test
-	public void test03() throws WrongClientTypeException, InterruptedException, CompanyNotFoundException  {	
+	public void test03() throws WrongClientTypeException, InterruptedException, CompanyNotFoundException, CompanyNameTakenException  {	
 			AdminFacade adminF = (AdminFacade) couponSystem.login("Admin", "1234", ClientType.ADMIN);
 			adminF.createCompany(comp1);
 			comp1.setPassword("asd");
@@ -111,10 +110,11 @@ CustomerRepository customerRepo;
 	 * tests getAllCompanies from AdminFacade
 	 * @throws InterruptedException
 	 * @throws WrongClientTypeException
+	 * @throws CompanyNameTakenException 
 	 */
 	
 	@Test
-	public void test04() throws WrongClientTypeException, InterruptedException {
+	public void test04() throws WrongClientTypeException, InterruptedException, CompanyNameTakenException {
 		AdminFacade adminF = (AdminFacade) couponSystem.login("Admin", "1234", ClientType.ADMIN);
 		adminF.createCompany(comp1);
 		adminF.createCompany(comp2);
@@ -128,11 +128,12 @@ CustomerRepository customerRepo;
 	 * tests createCustomer and getCustomer methods from AdminFacade
 	 * @throws WrongClientTypeException
 	 * @throws InterruptedException
+	 * @throws CustomerNameTakenException 
 	 */	
 	
 	
 	@Test
-	public void test05() throws InterruptedException, WrongClientTypeException{	
+	public void test05() throws InterruptedException, WrongClientTypeException, CustomerNameTakenException{	
 			AdminFacade adminF =(AdminFacade) couponSystem.login("Admin", "1234", ClientType.ADMIN);
 			adminF.createCustomer(cust1);		
 			testHelper.compareCustomers(cust1,adminF.getCustomer(cust1.getId()));
@@ -146,7 +147,7 @@ CustomerRepository customerRepo;
  */
 	
 	@Test
-	public void test06() throws WrongClientTypeException, InterruptedException {	
+	public void test06() throws WrongClientTypeException, InterruptedException, CustomerNameTakenException {	
 			AdminFacade adminF = (AdminFacade) couponSystem.login("Admin", "1234", ClientType.ADMIN);
 			adminF.createCustomer(cust1);
 			adminF.removeCustomer(cust1);
@@ -161,7 +162,7 @@ CustomerRepository customerRepo;
  * @throws CompanyNotFoundException
  */
 	@Test
-	public void test07() throws InterruptedException, WrongClientTypeException, CustomerNotFoundException {	
+	public void test07() throws InterruptedException, WrongClientTypeException, CustomerNotFoundException , CustomerNameTakenException{	
 			AdminFacade adminF = (AdminFacade) couponSystem.login("Admin", "1234", ClientType.ADMIN);
 			adminF.createCustomer(cust1);
 			cust1.setPassword("asd");
@@ -175,7 +176,7 @@ CustomerRepository customerRepo;
  * @throws InterruptedException
  */
 	@Test
-	public void test08() throws WrongClientTypeException, InterruptedException{
+	public void test08() throws WrongClientTypeException, InterruptedException, CustomerNameTakenException{
 		
 		AdminFacade adminF = (AdminFacade) couponSystem.login("Admin", "1234", ClientType.ADMIN);
 		adminF.createCustomer(cust1);
@@ -192,10 +193,12 @@ CustomerRepository customerRepo;
 	 * @throws WrongClientTypeException
 	 * @throws InterruptedException
 	 * @throws CompanyNotFoundException
+	 * @throws CouponAlreadyExistsException 
+	 * @throws CompanyNameTakenException 
 	 */
 	
 	@Test
-	public void test09() throws WrongClientTypeException, InterruptedException, CompanyNotFoundException {
+	public void test09() throws WrongClientTypeException, InterruptedException, CompanyNotFoundException, CouponAlreadyExistsException, CompanyNameTakenException {
 
 		AdminFacade adminF = (AdminFacade) couponSystem.login("Admin", "1234", ClientType.ADMIN);
 		adminF.createCompany(comp1);
@@ -213,11 +216,13 @@ CustomerRepository customerRepo;
 	 * @throws InterruptedException
 	 * @throws CompanyNotFoundException
 	 * @throws CouponNotFoundException
+	 * @throws CouponAlreadyExistsException 
+	 * @throws CompanyNameTakenException 
 	 */
 	
 	
 	@Test
-	public void test10() throws WrongClientTypeException, InterruptedException, CompanyNotFoundException, CouponNotFoundException {
+	public void test10() throws WrongClientTypeException, InterruptedException, CompanyNotFoundException, CouponNotFoundException, CouponAlreadyExistsException, CompanyNameTakenException {
 		AdminFacade adminF = (AdminFacade) couponSystem.login("Admin", "1234", ClientType.ADMIN);
 		adminF.createCompany(comp1);
 		adminF.createCompany(comp2);
@@ -233,11 +238,13 @@ CustomerRepository customerRepo;
  * @throws InterruptedException
  * @throws CompanyNotFoundException
  * @throws CouponNotFoundException
+ * @throws CouponAlreadyExistsException 
+ * @throws CompanyNameTakenException 
  */
 	
 	
 	@Test
-	public void test11() throws WrongClientTypeException, InterruptedException, CompanyNotFoundException, CouponNotFoundException {
+	public void test11() throws WrongClientTypeException, InterruptedException, CompanyNotFoundException, CouponNotFoundException, CouponAlreadyExistsException, CompanyNameTakenException {
 		AdminFacade adminF = (AdminFacade) couponSystem.login("Admin", "1234", ClientType.ADMIN);
 		adminF.createCompany(comp1);
 		adminF.createCompany(comp2);
@@ -254,10 +261,12 @@ CustomerRepository customerRepo;
  * @throws InterruptedException
  * @throws CompanyNotFoundException 0529986302
  * @throws CouponNotFoundException
+ * @throws CouponAlreadyExistsException 
+ * @throws CompanyNameTakenException 
  */
 	
 	@Test
-	public void test12() throws WrongClientTypeException, InterruptedException, CompanyNotFoundException, CouponNotFoundException {
+	public void test12() throws WrongClientTypeException, InterruptedException, CompanyNotFoundException, CouponNotFoundException, CouponAlreadyExistsException, CompanyNameTakenException {
 		AdminFacade adminF = (AdminFacade) couponSystem.login("Admin", "1234", ClientType.ADMIN);
 		adminF.createCompany(comp1);
 		adminF.createCompany(comp2);
@@ -281,10 +290,12 @@ CustomerRepository customerRepo;
  * @throws InterruptedException
  * @throws CompanyNotFoundException
  * @throws CouponNotFoundException
+ * @throws CouponAlreadyExistsException 
+ * @throws CompanyNameTakenException 
  */
 	
 	@Test
-	public void test13() throws WrongClientTypeException, InterruptedException, CompanyNotFoundException, CouponNotFoundException {
+	public void test13() throws WrongClientTypeException, InterruptedException, CompanyNotFoundException, CouponNotFoundException, CouponAlreadyExistsException, CompanyNameTakenException {
 		AdminFacade adminF = (AdminFacade) couponSystem.login("Admin", "1234", ClientType.ADMIN);
 		adminF.createCompany(comp1);
 		adminF.createCompany(comp2);
@@ -312,11 +323,13 @@ CustomerRepository customerRepo;
  * @throws InterruptedException
  * @throws CompanyNotFoundException
  * @throws CouponNotFoundException
+ * @throws CouponAlreadyExistsException 
+ * @throws CompanyNameTakenException 
  */
 	
 	
 	@Test
-	public void test14() throws WrongClientTypeException, InterruptedException, CompanyNotFoundException, CouponNotFoundException {
+	public void test14() throws WrongClientTypeException, InterruptedException, CompanyNotFoundException, CouponNotFoundException, CouponAlreadyExistsException, CompanyNameTakenException {
 		AdminFacade adminF = (AdminFacade) couponSystem.login("Admin", "1234", ClientType.ADMIN);
 		adminF.createCompany(comp1);
 		adminF.createCompany(comp2);
@@ -344,21 +357,24 @@ CustomerRepository customerRepo;
  * @throws InterruptedException
  * @throws CompanyNotFoundException
  * @throws CouponNotFoundException
+ * @throws CouponAlreadyExistsException 
+ * @throws ParseException 
+ * @throws CompanyNameTakenException 
  */
 	
 	
 	@Test
-	public void test15() throws WrongClientTypeException, InterruptedException, CompanyNotFoundException, CouponNotFoundException {
+	public void test15() throws WrongClientTypeException, InterruptedException, CompanyNotFoundException, CouponNotFoundException, CouponAlreadyExistsException, ParseException, CompanyNameTakenException {
 		AdminFacade adminF = (AdminFacade) couponSystem.login("Admin", "1234", ClientType.ADMIN);
 		adminF.createCompany(comp1);
 		adminF.createCompany(comp2);
 		CompanyFacade compF = (CompanyFacade) couponSystem.login("Kishurit", "1818",ClientType.COMPANY);
 		CompanyFacade compF2 = (CompanyFacade) couponSystem.login("JohnBryce","1234",ClientType.COMPANY);
-		coup1.setEndDate(date1);
-		coup2.setEndDate(date1);
-		coup3.setEndDate(date2);
-		coup4.setEndDate(date2);
-		coup5.setEndDate(date1);
+		coup1.setEndDate(df.parse("2018-12-31"));
+		coup2.setEndDate(df.parse("2018-12-31"));
+		coup3.setEndDate(df.parse("2019-12-31"));
+		coup4.setEndDate(df.parse("2019-12-31"));
+		coup5.setEndDate(df.parse("2018-12-31"));
 		compF.createCoupon(coup1);
 		compF.createCoupon(coup2);
 		compF.createCoupon(coup3);
@@ -367,7 +383,7 @@ CustomerRepository customerRepo;
 		List<Coupon> l2 = new ArrayList<>();
 		l2.add(coup1);
 		l2.add(coup2);
-		testHelper.couponListTester(compF.getCouponsByMaxEndDate(date3), l2);
+		testHelper.couponListTester(compF.getCouponsByMaxEndDate(df.parse("2019-05-30")), l2);
 	}
 	
 /**
@@ -377,10 +393,14 @@ CustomerRepository customerRepo;
  * @throws CompanyNotFoundException
  * @throws CustomerNotFoundException 
  * @throws CouponNotFoundException 
+ * @throws CouponAlreadyExistsException 
+ * @throws ParseException 
+ * @throws CustomerNameTakenException 
+ * @throws CompanyNameTakenException 
  */
 	
 	@Test
-	public void test16() throws InterruptedException, WrongClientTypeException, CompanyNotFoundException, CouponNotFoundException, CustomerNotFoundException  {
+	public void test16() throws InterruptedException, WrongClientTypeException, CompanyNotFoundException, CouponNotFoundException, CustomerNotFoundException, CouponAlreadyExistsException, ParseException, CustomerNameTakenException, CompanyNameTakenException  {
 		AdminFacade adminF = (AdminFacade) couponSystem.login("Admin", "1234", ClientType.ADMIN);
 		adminF.createCompany(comp1);
 		adminF.createCompany(comp2);
@@ -389,7 +409,7 @@ CustomerRepository customerRepo;
 		compF.createCoupon(coup1);
 		CustomerFacade custF = (CustomerFacade) couponSystem.login("dor", "123343",ClientType.CUSTOMER);
 		custF.purchaseCoupon(coup1);
-		testHelper.compareCoupons(coup1,custF.getCoupon(coup1));
+		testHelper.compareCoupons(coup1,custF.getCoupon(coup1.getId()));
 	
 	}
 	
@@ -400,10 +420,14 @@ CustomerRepository customerRepo;
  * @throws CompanyNotFoundException
  * @throws CouponNotFoundException
  * @throws CustomerNotFoundException
+ * @throws CouponAlreadyExistsException 
+ * @throws ParseException 
+ * @throws CompanyNameTakenException 
+ * @throws CustomerNameTakenException 
  */
 	
 	@Test
-	public void test17() throws InterruptedException, WrongClientTypeException, CompanyNotFoundException, CouponNotFoundException, CustomerNotFoundException  {
+	public void test17() throws InterruptedException, WrongClientTypeException, CompanyNotFoundException, CouponNotFoundException, CustomerNotFoundException, CouponAlreadyExistsException, ParseException, CompanyNameTakenException, CustomerNameTakenException  {
 		AdminFacade adminF = (AdminFacade) couponSystem.login("Admin", "1234", ClientType.ADMIN);
 		adminF.createCompany(comp1);
 		adminF.createCompany(comp2);
@@ -437,10 +461,14 @@ CustomerRepository customerRepo;
  * @throws CompanyNotFoundException
  * @throws CouponNotFoundException
  * @throws CustomerNotFoundException
+ * @throws CouponAlreadyExistsException 
+ * @throws ParseException 
+ * @throws CompanyNameTakenException 
+ * @throws CustomerNameTakenException 
  */
 	
 	@Test
-	public void test18() throws InterruptedException, WrongClientTypeException, CompanyNotFoundException, CouponNotFoundException, CustomerNotFoundException  {
+	public void test18() throws InterruptedException, WrongClientTypeException, CompanyNotFoundException, CouponNotFoundException, CustomerNotFoundException, CouponAlreadyExistsException, ParseException, CompanyNameTakenException, CustomerNameTakenException  {
 		AdminFacade adminF = (AdminFacade) couponSystem.login("Admin", "1234", ClientType.ADMIN);
 		adminF.createCompany(comp1);
 		adminF.createCompany(comp2);
@@ -479,16 +507,21 @@ CustomerRepository customerRepo;
  * @throws CompanyNotFoundException
  * @throws CouponNotFoundException
  * @throws CustomerNotFoundException
+ * @throws CouponAlreadyExistsException 
+ * @throws ParseException 
+ * @throws CustomerNameTakenException 
+ * @throws CompanyNameTakenException 
  */
 	
 	@Test
-	public void test19() throws InterruptedException, WrongClientTypeException, CompanyNotFoundException, CouponNotFoundException, CustomerNotFoundException  {
+	public void test19() throws InterruptedException, WrongClientTypeException, CompanyNotFoundException, CouponNotFoundException, CustomerNotFoundException, CouponAlreadyExistsException, ParseException, CustomerNameTakenException, CompanyNameTakenException  {
 		AdminFacade adminF = (AdminFacade) couponSystem.login("Admin", "1234", ClientType.ADMIN);
 		adminF.createCompany(comp1);
 		adminF.createCompany(comp2);
 		adminF.createCustomer(cust1);
 		adminF.createCustomer(cust2);
 		CompanyFacade compF = (CompanyFacade) couponSystem.login("Kishurit", "1818",ClientType.COMPANY);
+		CompanyFacade compF2 = (CompanyFacade) couponSystem.login("JohnBryce", "1234",ClientType.COMPANY);
 		coup1.setPrice(500d);
 		coup2.setPrice(600d);
 		coup3.setPrice(400d);
@@ -497,8 +530,8 @@ CustomerRepository customerRepo;
 		compF.createCoupon(coup1);
 		compF.createCoupon(coup2);
 		compF.createCoupon(coup3);
-		compF.createCoupon(coup4);
-		compF.createCoupon(coup5);
+		compF2.createCoupon(coup4);
+		compF2.createCoupon(coup5);
 		CustomerFacade custF = (CustomerFacade) couponSystem.login("dor", "123343",ClientType.CUSTOMER);
 		CustomerFacade custF2 = (CustomerFacade) couponSystem.login("user", "1111",ClientType.CUSTOMER);
 		custF.purchaseCoupon(coup1);
@@ -510,6 +543,25 @@ CustomerRepository customerRepo;
 		l2.add(coup1);
 		l2.add(coup3);
 		testHelper.couponListTester(custF.getAllPurchasedCouponsByMaxPrice(550d), l2);
+
+	
+	}
+	
+	@Test
+	public void test20() throws InterruptedException, WrongClientTypeException, CompanyNotFoundException, CouponNotFoundException, CustomerNotFoundException, CouponAlreadyExistsException, CompanyNameTakenException, CustomerNameTakenException  {
+		AdminFacade adminF = (AdminFacade) couponSystem.login("Admin", "1234", ClientType.ADMIN);
+		adminF.createCompany(comp1);
+		adminF.createCompany(comp2);
+		adminF.createCustomer(cust1);
+		adminF.createCustomer(cust2);
+		CompanyFacade compF = (CompanyFacade) couponSystem.login("Kishurit", "1818",ClientType.COMPANY);
+		CompanyFacade compF2 = (CompanyFacade) couponSystem.login("JohnBryce", "1234",ClientType.COMPANY);
+		compF.createCoupon(coup1);
+		compF.createCoupon(coup2);
+		compF.createCoupon(coup3);
+		compF2.createCoupon(coup4);
+		compF2.createCoupon(coup5);
+		
 	
 	}
 	

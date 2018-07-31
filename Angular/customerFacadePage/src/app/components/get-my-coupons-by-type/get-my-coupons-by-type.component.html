@@ -1,0 +1,44 @@
+
+<form class="form-horizontal">
+  <div class="form-group">
+    <label for="typeToGet" class="control-label col-sm-2">Select Coupon Type:</label>
+    <div class="col-sm-2">
+      <select class="form-control" name="typeToGet" [(ngModel)]="typeToGet">
+        <option value = "CLOTHING">Clothing</option>
+        <option value = "ELECTRONICS">Electronics</option>
+        <option value = "FOOD">Food</option>
+        <option value = "VACATIONS">Vacations</option>
+        <option value = "FLIGHTS">Flights</option>
+      </select>
+ </div>
+ </div>
+ </form>
+
+<table style="margin-left: 10px"  class="table table-striped"> 
+  <thead>
+    <tr>
+      <th style="width: 5%"  > ID  </th>
+      <th style="width: 5%"  > TITLE </th>
+      <th style="width: 5%"  > START DATE </th>
+      <th style="width: 5%"  > END DATE </th>
+      <th style="width: 5%"  > TYPE </th>
+      <th style="width: 5%"  > MESSAGE </th>
+      <th style="width: 5%"  > PRICE </th>
+      <th style="width: 15%"  > IMAGE </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let c of _coupons">
+      <td  ><b>  {{c.id}} </b></td>
+      <td  ><b>  {{c.title}} </b></td>
+      <td  ><b>  {{c.startDate}} </b></td>
+      <td  ><b>  {{c.endDate}} </b></td>
+      <td  ><b>  {{c.type}} </b></td>
+      <td  ><b>  {{c.message}} </b></td>
+      <td  ><b>  {{c.price}} </b></td>
+      <td  ><img src = {{c.image}}></td>
+    </tr>
+  </tbody>
+
+  <button (click) = "getCouponsByType()" class="btn btn-success btn-lg"> Get Coupons <span class="glyphicon glyphicon-list-alt"></span></button>
+</table>

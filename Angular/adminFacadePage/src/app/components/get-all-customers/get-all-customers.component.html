@@ -1,0 +1,19 @@
+
+<table style="margin-left: 10px"  class="table table-striped">
+  <thead>
+    <tr>
+      <th style="width: 10%"  > ID  </th>
+      <th style="width: 30%"  > NAME </th>
+      <th style="width: 70%"  > Edit </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let cust of _customers">
+      <td  ><b>  {{cust.id}} </b></td>
+      <td  ><b>  {{cust.customerName}} </b></td>
+      <td  > <button class = "btn btn-primary btn-xs" (click) = "updateCustomer(cust.id)"><span class="glyphicon glyphicon-cog"></span> </button></td>
+    </tr>
+  </tbody>
+
+  <button (click) = "getCustomers()" class="btn btn-success btn-lg"> Get Customers <span class="glyphicon glyphicon-list-alt"></span></button>
+</table>

@@ -1,0 +1,21 @@
+
+<table style="margin-left: 10px"  class="table table-striped">
+    <thead>
+      <tr>
+        <th style="width: 5%"  > ID  </th>
+        <th style="width: 20%"  > NAME </th>
+        <th style="width: 20%"  > E-Mail </th>
+        <th style="width: 55%"  > Edit </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let c of _companies">
+        <td  ><b>  {{c.id}} </b></td>
+        <td  ><b>  {{c.companyName}} </b></td>
+        <td  ><b>  {{c.email}} </b></td>
+        <td  > <button class = "btn btn-primary btn-xs" (click) ="updateCompany(c.id)"><span class="glyphicon glyphicon-cog"></span> </button></td>
+      </tr>
+    </tbody>
+
+    <button (click) = "getCompanies()" class="btn btn-success btn-lg"> Get Companies <span class="glyphicon glyphicon-list-alt"></span></button>
+</table>

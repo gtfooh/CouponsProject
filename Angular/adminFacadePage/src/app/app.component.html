@@ -1,0 +1,51 @@
+
+
+
+<nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="#">Coupon System</a>
+          </div>
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse"
+                    data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#">Company</a>
+              <ul class="dropdown-menu">
+                <li><a routerLink = "/createcompany">Create Company</a></li>
+                <li><a routerLink="/updatecompany">Edit Company</a></li>
+                <li><a routerLink="/getallcompanies">Get All Companies</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Customer</a>
+                <ul class="dropdown-menu">
+                    <li><a routerLink = "/createcustomer">Create Customer</a></li>
+                    <li><a routerLink = "/updatecustomer">Edit Customer</a></li>
+                    <li><a routerLink = "/getallcustomers">Get All Customers</a></li>
+                </ul>
+              </li>
+              <li class="dropdown">
+                  <a class="dropdown-toggle" data-toggle="dropdown" href="#">General</a>
+                  <ul class="dropdown-menu">
+                    <li><a [swal]="['Oops!', 'This is not implemented yet :/', 'warning']" href="#">Cool Admin Stuff</a></li>
+                    <li><a routerLink = "/shutdown">Shutdown</a></li>
+                  </ul>
+                </li>
+                <li><a (click) = "logout()">Log Out</a></li>
+          </ul>
+        </div>
+      </div>
+      </nav>
+
+
+    <router-outlet></router-outlet>
+
+    
